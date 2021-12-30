@@ -32,5 +32,13 @@ RUN cd jcc \
 ENV ANT=ant PYTHON=python JCC="python -m jcc"
 RUN make all install NUM_FILES=10
 
+# override jupyter lab default theme
+WORKDIR ${CONDA_DIR}/share/jupyter/lab/settings
+ADD overrides.json .
+RUN fix-permissions "${CONDA_DIR}" && \
+    chown ${NB_UID} ${CONDA_DIR}/share/jupyter/lab/settings -R && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Switch back to $NB_UID
 USER ${NB_UID}
 WORKDIR "${HOME}"
